@@ -1,12 +1,10 @@
-import base64
 import json
 import os
-
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
-    
+from PIL import Image
+from utils import get_llava_cot_response
+ 
 def verification_prompt(image_path, caption, text_evidences, image_evidences):
+    images = []
     messages =  [{
     "role": "user",
     "content": [
@@ -24,11 +22,7 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
         "text": f"Caption: {caption}",
         },
         {
-        "type": "image_url",
-        "image_url": {
-            "url": f"data:image/jpeg;base64,{encode_image(image_path)}",
-            "detail": "high"
-            },
+        "type": "image",
         },
         {
         "type": "text",
@@ -36,6 +30,8 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
         },
     ],
     }]
+    image = Image.open(image_path)
+    images.append(image)
     for i in range(len(text_evidences)):
         messages[0]["content"].append({
             "type": "text",
@@ -47,21 +43,19 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
     })
     for i in range(len(image_evidences)):
         messages[0]["content"].append({
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/jpeg;base64,{encode_image(image_evidences[i])}",
-                "detail": "high"
-            }
+            "type": "image",
         })
-    return messages
+        image = Image.open(image_evidences[i])
+        images.append(image)
+    return {
+        "messages" : messages,
+        "images" : images
+        }
 
 def get_response_subs(file_name, image_path, caption, text_evidences, image_evidences, client):
     prompt = verification_prompt(image_path, caption, text_evidences, image_evidences)
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        messages=prompt,
-    )
+    response = get_llava_cot_response(prompt,client)
     if not os.path.exists(f"./data/generated/{file_name}/"):
         os.makedirs(f"./data/generated/{file_name}/")
     with open(f"./data/generated/{file_name}/verification.json", "w") as f:
-        json.dump({"response": response.choices[0].message.content, "num text evidence": len(text_evidences), "num image evidence": len(image_evidences)}, f)
+        json.dump({"response": response, "num text evidence": len(text_evidences), "num image evidence": len(image_evidences)}, f)

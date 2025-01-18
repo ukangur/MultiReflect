@@ -6,15 +6,17 @@ from ranking import combined
 from verification import verify
 from utils import *
 
-from openai import OpenAI
+# from openai import OpenAI
 import pandas as pd
 import os
 import re
 from PIL import Image
 
-api_key = os.getenv("OPENAI_API_KEY")
+# api_key = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(api_key=api_key, timeout=100)
+# client = OpenAI(api_key=api_key, timeout=100)
+quantized_model_path="OPEA/Llama-3.2V-11B-cot-int4-sym-inc"
+client = ImageTextToImageModel(quantized_model_path)
 
 def consistency_response(image_path, caption, idx):
     response = gpt4_consistency.get_response(image_path, caption, client)
@@ -148,9 +150,8 @@ def init_pipeline(image_path, caption, idx):
             print('-'*50)
             # Move to Ranking
             print('Ranking Text and Image for Sample', idx)
-            encoded_image = encode_image(image_path)
-            combined.get_text_scores(idx, caption, encoded_image, client)
-            combined.get_image_scores(idx, caption, encoded_image, client)
+            combined.get_text_scores(idx, caption, image_path, client)
+            combined.get_image_scores(idx, caption, image_path, client)
             print('Ranking Done for Sample', idx)
             print('-'*50)
             # Check for each evidence

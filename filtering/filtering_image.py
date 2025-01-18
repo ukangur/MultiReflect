@@ -3,8 +3,8 @@ from transformers import CLIPProcessor, CLIPModel
 import torch
 import os
 
-model = CLIPModel.from_pretrained('./filtering/clip_base_model')
-processor = CLIPProcessor.from_pretrained('./filtering/clip_base_processor')
+model = CLIPModel.from_pretrained('openai/clip-vit-large-patch14')
+processor = CLIPProcessor.from_pretrained('openai/clip-vit-large-patch14')
 
 cos = torch.nn.CosineSimilarity()
 
