@@ -29,6 +29,8 @@ def get_prompt_first(image_path, caption):
 
 def get_prompt_subs(image_path, caption, text_evidences, image_evidences):
     images = []
+    image = Image.open(image_path)
+    images.append(image)
     messages =  [{
     "role": "user",
     "content": [
