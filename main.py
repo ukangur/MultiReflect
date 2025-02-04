@@ -11,19 +11,26 @@ import pandas as pd
 import os
 import re
 from PIL import Image
+import yaml
 
 # api_key = os.getenv("OPENAI_API_KEY")
 
 # client = OpenAI(api_key=api_key, timeout=100)
-quantized_model_path="OPEA/Llama-3.2V-11B-cot-int4-sym-inc"
-client = ImageTextToImageModel(quantized_model_path)
+def load_config(config_file='config.yaml'):
+    """Load configuration settings from a YAML file."""
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
+
+config = load_config()
+client = ImageTextToImageModel(config['model_id'])
 
 def consistency_response(image_path, caption, idx):
     response = gpt4_consistency.get_response(image_path, caption, client)
     verdict = 0
-    if not os.path.exists(f"./data/generated/{idx}/"):
-        os.makedirs(f"./data/generated/{idx}/")
-    save_json({"consistency_response": response}, f"./data/generated/{idx}/consistency_response.json")
+    if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
+        os.makedirs(f"{config['output_path']}/generated/{idx}/")
+    save_json({"consistency_response": response}, f"{config['output_path']}/generated/{idx}/consistency_response.json")
     if "<verdict>TRUE</verdict>" in response:
         verdict = 1
     elif "<verdict>FALSE</verdict>" in response:
@@ -50,9 +57,9 @@ def consistency_response(image_path, caption, idx):
 def eval_check_response(image_path, caption, text_evidences, image_evidences, idx, first):
     if first:
         response = gpt4_evalcheck.get_response_first(image_path, caption, client)
-        if not os.path.exists(f"./data/generated/{idx}/"):
-            os.makedirs(f"./data/generated/{idx}/")
-        append_jsonl({"eval_check_response": response, "check": "first"}, f"./data/generated/{idx}/eval_check_response.jsonl")
+        if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
+            os.makedirs(f"{config['output_path']}/generated/{idx}/")
+        append_jsonl({"eval_check_response": response, "check": "first"}, f"{config['output_path']}/generated/{idx}/eval_check_response.jsonl")
         response_lines = response.split("\n")
         needs_retrieval = True
         if 'Yes' in response_lines[0] or 'yes' in response_lines[0].lower():
@@ -69,9 +76,9 @@ def eval_check_response(image_path, caption, text_evidences, image_evidences, id
         return needs_retrieval
     else:
         response = gpt4_evalcheck.get_response_subs(image_path, caption, text_evidences, image_evidences, client)
-        if not os.path.exists(f"./data/generated/{idx}/"):
-            os.makedirs(f"./data/generated/{idx}/")
-        append_jsonl({"eval_check_response": response, "check": "subsequent"}, f"./data/generated/{idx}/eval_check_response.jsonl")
+        if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
+            os.makedirs(f"{config['output_path']}/generated/{idx}/")
+        append_jsonl({"eval_check_response": response, "check": "subsequent"}, f"{config['output_path']}/generated/{idx}/eval_check_response.json")
         response_lines = response.split("\n")
         needs_retrieval = True
         if '[Continue to Use Evidence]' in response_lines[0]:
@@ -93,21 +100,21 @@ def get_evidences(image_path, caption, idx):
     with open(image_path, "rb") as f:
         image_content = f.read()
     wikipedia_search, google_search, bing_search, inverse_google_search, inverse_bing_search, inverse_google_data, inverse_bing_data = text_retrieval.get_data(caption, image_content)
-    if not os.path.exists(f"./data/retrieved/{idx}/text_data"):
-        os.makedirs(f"./data/retrieved/{idx}/text_data")
-    save_json(wikipedia_search, f"./data/retrieved/{idx}/text_data/wikipedia_search.json")
-    save_json(google_search, f"./data/retrieved/{idx}/text_data/google_search.json")
-    save_json(bing_search, f"./data/retrieved/{idx}/text_data/bing_search.json")
-    save_json(inverse_google_search, f"./data/retrieved/{idx}/text_data/inverse_google_search.json")
-    save_json(inverse_bing_search, f"./data/retrieved/{idx}/text_data/inverse_bing_search.json")
-    save_json(inverse_google_data, f"./data/retrieved/{idx}/text_data/inverse_google_data.json")
-    save_json(inverse_bing_data, f"./data/retrieved/{idx}/text_data/inverse_bing_data.json")
+    if not os.path.exists(f"{config['output_path']}/retrieved/{idx}/text_data"):
+        os.makedirs(f"{config['output_path']}/retrieved/{idx}/text_data")
+    save_json(wikipedia_search, f"{config['output_path']}/retrieved/{idx}/text_data/wikipedia_search.json")
+    save_json(google_search, f"{config['output_path']}/retrieved/{idx}/text_data/google_search.json")
+    save_json(bing_search, f"{config['output_path']}/retrieved/{idx}/text_data/bing_search.json")
+    save_json(inverse_google_search, f"{config['output_path']}/retrieved/{idx}/text_data/inverse_google_search.json")
+    save_json(inverse_bing_search, f"{config['output_path']}/retrieved/{idx}/text_data/inverse_bing_search.json")
+    save_json(inverse_google_data, f"{config['output_path']}/retrieved/{idx}/text_data/inverse_google_data.json")
+    save_json(inverse_bing_data, f"{config['output_path']}/retrieved/{idx}/text_data/inverse_bing_data.json")
     google_image_data, bing_image_data, commons_data = image_retrieval.get_image_data(caption, idx)
-    if not os.path.exists(f"./data/retrieved/{idx}/image_data"):
-        os.makedirs(f"./data/retrieved/{idx}/image_data")
-    save_json(google_image_data, f"./data/retrieved/{idx}/image_data/google_image_data.json")
-    save_json(bing_image_data, f"./data/retrieved/{idx}/image_data/bing_image_data.json")
-    save_json(commons_data, f"./data/retrieved/{idx}/image_data/commons_data.json")
+    if not os.path.exists(f"{config['output_path']}/retrieved/{idx}/image_data"):
+        os.makedirs(f"{config['output_path']}/retrieved/{idx}/image_data")
+    save_json(google_image_data, f"{config['output_path']}/retrieved/{idx}/image_data/google_image_data.json")
+    save_json(bing_image_data, f"{config['output_path']}/retrieved/{idx}/image_data/bing_image_data.json")
+    save_json(commons_data, f"{config['output_path']}/retrieved/{idx}/image_data/commons_data.json")
 
 def init_pipeline(image_path, caption, idx):
     print('Checking Consistency for Sample', idx)
@@ -156,13 +163,13 @@ def init_pipeline(image_path, caption, idx):
             print('-'*50)
             # Check for each evidence
             print('Checking for each Evidence for Sample', idx)
-            text_evidences = pd.read_csv(f'./data/ranking_score/{idx}/text_data/final_scores.csv')
+            text_evidences = pd.read_csv(f"{config['output_path']}/ranking_score/{idx}/text_data/final_scores.csv")
             text_evidences = text_evidences[text_evidences["total"]>0]
             if len(text_evidences) == 0:
                 text_evidences = []
             else:
                 text_evidences = text_evidences.sort_values(by="total", ascending=False)["evidence"].tolist()
-            image_evidences = pd.read_csv(f'./data/ranking_score/{idx}/image_data/final_scores.csv')
+            image_evidences = pd.read_csv(f"{config['output_path']}/ranking_score/{idx}/image_data/final_scores.csv")
             image_evidences = image_evidences[image_evidences["total"]>0]
             if len(image_evidences) == 0:
                 image_evidences = []
@@ -179,7 +186,7 @@ def init_pipeline(image_path, caption, idx):
                     selected_text_evidences.append(text_evidences[curr_text_idx])
                     curr_text_idx += 1
                 if curr_image_idx < len(image_evidences):
-                    selected_image_evidences.append(f'./data/filtered/{idx}/image_data/'+image_evidences[curr_image_idx])
+                    selected_image_evidences.append("{config['output_path']}/filtered/{idx}/image_data/"+image_evidences[curr_image_idx])
                     curr_image_idx += 1
                 if not eval_check_response(image_path, caption, selected_text_evidences, selected_image_evidences, idx, first=False):
                     break
@@ -209,11 +216,11 @@ def init_pipeline(image_path, caption, idx):
         print('-'*50)
         
 
-df = pd.read_csv("./data/original/VERITE.csv")
+df = pd.read_csv(f"{config['data_path']}/VERITE.csv")
 for idx in range(27):
     try:
         caption = df.iloc[idx]['caption']
-        image_path = f"./data/original/{df.iloc[idx]['image_path']}"
+        image_path = f"{config['data_path']}/{df.iloc[idx]['image_path']}"
         init_pipeline(image_path, caption, idx)
     except Exception as e:
         print(e, idx)

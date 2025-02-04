@@ -1,5 +1,5 @@
 from transformers import MllamaForConditionalGeneration, AutoProcessor
-
+from auto_round import AutoRoundConfig
 import json
 import os
 import base64
