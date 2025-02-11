@@ -139,22 +139,10 @@ To run the full pipeline, you need to create several API keys:
 4. Get [Wikimedia API](https://api.wikimedia.org/wiki/Main_Page) app name, email and key.
 
 ### Running the Main Script
-To execute the primary functionality, run with your corresponding keys from the previous step:
-
-<!--
-
-python main.py --bingkey "YOUR_BING_API_KEY" --wikimediaappname "YOUR_WIKIMEDIA_APP_NAME" --wikimediaemail "YOUR_WIKIMEDIA_EMAIL" --wikimediakey "YOUR_WIKIMEDIA_KEY" --serviceskeypath "PATH_TO_YOUR_GOOGLE_SERVICE_KEY" --googlekey "YOUR_GOOGLE_API_KEY" --openaikey "YOUR_OPENAI_KEY"
--->
+To execute the primary functionality ,add your corresponding keys and model info into the config file. After that just run:
 
 ```bash
-python main.py \
-  --bingkey "YOUR_BING_API_KEY" \
-  --wikimediaappname "YOUR_WIKIMEDIA_APP_NAME" \
-  --wikimediaemail "YOUR_WIKIMEDIA_EMAIL" \
-  --wikimediakey "YOUR_WIKIMEDIA_KEY" \
-  --serviceskeypath "PATH_TO_YOUR_GOOGLE_SERVICE_KEY" \
-  --googlekey "YOUR_GOOGLE_API_KEY" \
-  --openaikey "YOUR_OPENAI_KEY"
+python main.py
 ``` 
 
 After running main.py, you will see the printed progress of each datapoint in your dataset
@@ -217,7 +205,7 @@ TRUE
 ### Alternative Modes
 - **No Retrieval Mode**: This mode will run the pipeline without phases 2-5, thus only checking for consistency and running verification directly after.
   ```bash
-  python no_retrieval.py --openaikey "YOUR_OPENAI_KEY"
+  python no_retrieval.py
   ```
 
 ### Module-Specific Execution
