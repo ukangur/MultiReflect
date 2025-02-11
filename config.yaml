@@ -1,0 +1,5 @@
+"model_id": "Xkev/Llama-3.2V-11B-cot"
+"clip_model_id": 'openai/clip-vit-large-patch14'
+"data_path": "./data/original"
+"output_path": "./data"
+"device_map": "auto"

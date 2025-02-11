@@ -2,11 +2,16 @@ import spacy
 import requests
 import json
 from google.cloud import vision
+from google.oauth2 import service_account
 from bs4 import BeautifulSoup
 
 nlp = spacy.load('en_core_web_sm')
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36 Edg/122.0.0.0', 'Referer': 'https://www.google.com/'}
-client = vision.ImageAnnotatorClient()
+credentials = service_account.Credentials.from_service_account_file(
+            "united-night-415313-e0f6717686d1.json",
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+client = vision.ImageAnnotatorClient(credentials=credentials)
 
 def get_entities(text):
     doc = nlp(text)

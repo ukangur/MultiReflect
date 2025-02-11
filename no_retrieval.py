@@ -6,15 +6,17 @@ from ranking import combined
 from verification import verify_noevi
 from utils import *
 
-from openai import OpenAI
+# from openai import OpenAI
 import pandas as pd
-import os
-import re
+# import os
+# import re
 from PIL import Image
 
-api_key = os.getenv("OPENAI_API_KEY")
+# api_key = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(api_key=api_key, timeout=100)
+# client = OpenAI(api_key=api_key, timeout=100)
+quantized_model_path="OPEA/Llama-3.2V-11B-cot-int4-sym-inc"
+client = ImageTextToImageModel(quantized_model_path)
 
 def init_pipeline(image_path, caption, idx):
     verify_noevi.get_response_subs(idx, image_path, caption, client)

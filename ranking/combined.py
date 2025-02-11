@@ -67,10 +67,10 @@ def get_usefulness_score(text):
                 continue
     return 0
 
-def get_text_scores(file_name, caption, encoded_image, client):
-    text_rel = relevance.get_text_to_image_relevance_sample(file_name, encoded_image, client)
-    text_sup = support.get_text_support_sample(file_name, caption, encoded_image, client)
-    text_use = useful.get_text_useful_sample(file_name, caption, encoded_image, client)
+def get_text_scores(file_name, caption, image_path, client):
+    text_rel = relevance.get_text_to_image_relevance_sample(file_name, image_path, client)
+    text_sup = support.get_text_support_sample(file_name, caption, image_path, client)
+    text_use = useful.get_text_useful_sample(file_name, caption, image_path, client)
     text_aut = authoritative.get_authoritative_scores(file_name)
     text_fresh = freshness.get_freshness_scores(file_name)
     
@@ -136,10 +136,10 @@ def get_text_scores(file_name, caption, encoded_image, client):
     df = pd.DataFrame(final_metrics)
     df.to_csv(f'./data/ranking_score/{file_name}/text_data/final_scores.csv', index=False)
     
-def get_image_scores(file_name, caption, encoded_image, client):
+def get_image_scores(file_name, caption, image_path, client):
     image_rel = relevance.get_image_to_text_relevance_sample(file_name, caption, client)
-    image_sup = support.get_image_support_sample(file_name, caption, encoded_image, client)
-    image_use = useful.get_image_useful_sample(file_name, caption, encoded_image, client)
+    image_sup = support.get_image_support_sample(file_name, caption, image_path, client)
+    image_use = useful.get_image_useful_sample(file_name, caption, image_path, client)
     
     if not os.path.exists(f'./data/ranking_score/{file_name}/image_data'):
         os.makedirs(f'./data/ranking_score/{file_name}/image_data')

@@ -1,34 +1,36 @@
-import base64
-
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+from PIL import Image
+from utils import get_llava_cot_response
     
 def get_prompt_first(image_path, caption):
-    return [{
-    "role": "user",
-    "content": [
-        {
-        "type": "text",
-        "text": """Given a image and caption, please make a judgment on whether finding some external documents
-from the web (e.g., Wikipedia) helps to decide whether the image and caption is factually correct. Please answer [Yes] or
-[No] and write an explanation."""
-        },
-        {
-        "type": "text",
-        "text": f"Caption: {caption}",
-        },
-        {
-        "type": "image_url",
-        "image_url": {
-            "url": f"data:image/jpeg;base64,{encode_image(image_path)}",
-            "detail": "high"
-        },
-        },
-    ],
-    }]
+    image = Image.open(image_path)
+    return {
+        "messages": [{
+        "role": "user",
+        "content": [
+            {
+            "type": "text",
+            "text": """
+            Given a image and caption, please make a judgment on whether finding some external documents
+            from the web (e.g., Wikipedia) helps to decide whether the image and caption is factually correct. Please answer [Yes] or
+            [No] and write an explanation.
+            """
+            },
+            {
+            "type": "text",
+            "text": f"Caption: {caption}",
+            },
+            {
+            "type": "image",
+            },
+        ],
+        }],
+        "images": [image]
+    }
 
 def get_prompt_subs(image_path, caption, text_evidences, image_evidences):
+    images = []
+    image = Image.open(image_path)
+    images.append(image)
     messages =  [{
     "role": "user",
     "content": [
@@ -50,11 +52,7 @@ def get_prompt_subs(image_path, caption, text_evidences, image_evidences):
         "text": f"Caption: {caption}",
         },
         {
-        "type": "image_url",
-        "image_url": {
-            "url": f"data:image/jpeg;base64,{encode_image(image_path)}",
-            "detail": "high"
-            },
+        "type": "image",
         },
         {
         "type": "text",
@@ -71,28 +69,21 @@ def get_prompt_subs(image_path, caption, text_evidences, image_evidences):
         "type": "text",
         "text": f"Image Evidences:"
     })
-    for i in range(len(image_evidences)):
+    for i in range(len(image_evidences)): 
         messages[0]["content"].append({
-            "type": "image_url",
-            "image_url": {
-                "url": f"data:image/jpeg;base64,{encode_image(image_evidences[i])}",
-                "detail": "high"
-            }
+            "type": "image",
         })
-    return messages
-    
+        image = Image.open(image_evidences[i])
+        images.append(image)
+    return {
+        "messages" : messages,
+        "images" : images
+    }
+
 def get_response_first(image_path, caption, client):
     prompt = get_prompt_first(image_path, caption)
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        messages=prompt,
-    )
-    return response.choices[0].message.content
+    return get_llava_cot_response(prompt,client)
 
 def get_response_subs(image_path, caption, text_evidences, image_evidences, client):
     prompt = get_prompt_subs(image_path, caption, text_evidences, image_evidences)
-    response = client.chat.completions.create(
-        model="gpt-4-vision-preview",
-        messages=prompt,
-    )
-    return response.choices[0].message.content
+    return get_llava_cot_response(prompt,client)

@@ -5,7 +5,7 @@ import json
 from bs4 import BeautifulSoup
 import spacy
 
-model = SentenceTransformer('./filtering/sentence_transformer_mpnet')
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36 Edg/122.0.0.0', 'Referer': 'https://www.google.com/'}
 nlp = spacy.load('en_core_web_sm')
 
