@@ -4,11 +4,13 @@ import json
 from google.cloud import vision
 from google.oauth2 import service_account
 from bs4 import BeautifulSoup
+from utils import load_config
 
+config = load_config()
 nlp = spacy.load('en_core_web_sm')
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36 Edg/122.0.0.0', 'Referer': 'https://www.google.com/'}
 credentials = service_account.Credentials.from_service_account_file(
-            "united-night-415313-e0f6717686d1.json",
+            config["google_oauth_credentials"],
             scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
 client = vision.ImageAnnotatorClient(credentials=credentials)
@@ -37,7 +39,7 @@ def get_wikipedia_data(query):
     
 def get_google_data(query):
     try:
-        url = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCXi8wXOFREwIwDZ0B4OqD5L2EKSmyoo_M&cx=b7f8c7d4cce094056&q=" + query
+        url = f"https://www.googleapis.com/customsearch/v1?key={config["google_customseacrh_key"]}&cx=b7f8c7d4cce094056&q=" + query
         response = requests.get(url, timeout=60)
         data = response.json()
         return data            
@@ -48,7 +50,7 @@ def get_bing_search_results(query):
     url = "https://api.bing.microsoft.com/v7.0/search"
     headers = {
         "Content-Type": "multipart/form-data",
-        "Ocp-Apim-Subscription-Key": "929c5b48185c49238f06ef8ce0bfe4a9",
+        "Ocp-Apim-Subscription-Key": config["bing_ocp_apim_subscription_key"], 
     }
     params = {
         "q": query,
@@ -103,7 +105,7 @@ def get_bing_image_response(content):
     base_url = "https://api.bing.microsoft.com/v7.0/images/visualsearch"
     bing_inverse_headers = {
         "Content-Type": "multipart/form-data",
-        "Ocp-Apim-Subscription-Key": "929c5b48185c49238f06ef8ce0bfe4a9",
+        "Ocp-Apim-Subscription-Key": config["bing_ocp_apim_subscription_key"], 
     }
     data = {}
     try:

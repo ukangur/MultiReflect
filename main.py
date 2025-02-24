@@ -11,16 +11,11 @@ import pandas as pd
 import os
 import re
 from PIL import Image
-import yaml
 
 # api_key = os.getenv("OPENAI_API_KEY")
 
 # client = OpenAI(api_key=api_key, timeout=100)
-def load_config(config_file='config.yaml'):
-    """Load configuration settings from a YAML file."""
-    with open(config_file, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
+
 
 config = load_config()
 client = ImageTextToImageModel(config['model_id'])
@@ -217,7 +212,7 @@ def init_pipeline(image_path, caption, idx):
         
 
 df = pd.read_csv(f"{config['data_path']}/VERITE.csv")
-for idx in range(len(df):
+for idx in range(len(df)):
     try:
         caption = df.iloc[idx]['caption']
         image_path = f"{config['data_path']}/{df.iloc[idx]['image_path']}"

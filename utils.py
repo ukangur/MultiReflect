@@ -4,6 +4,13 @@ import json
 import os
 import base64
 import re
+import yaml
+
+def load_config(config_file='config.yaml'):
+    """Load configuration settings from a YAML file."""
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
 
 class ImageTextToImageModel():
     def __init__(self, checkpoint):

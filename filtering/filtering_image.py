@@ -2,9 +2,11 @@ from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 import torch
 import os
+from utils import load_config
 
-model = CLIPModel.from_pretrained('openai/clip-vit-large-patch14')
-processor = CLIPProcessor.from_pretrained('openai/clip-vit-large-patch14')
+config = load_config()
+model = CLIPModel.from_pretrained(config["clip_model_id"]) 
+processor = CLIPProcessor.from_pretrained(config["clip_model_id"])
 
 cos = torch.nn.CosineSimilarity()
 
