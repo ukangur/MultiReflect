@@ -6,19 +6,24 @@ from ranking import combined
 from verification import verify
 from utils import *
 
-# from openai import OpenAI
+from openai import OpenAI
 import pandas as pd
 import os
 import re
 from PIL import Image
 
-# api_key = os.getenv("OPENAI_API_KEY")
-
-# client = OpenAI(api_key=api_key, timeout=100)
 
 
 config = load_config()
-client = ImageTextToImageModel(config['model_id'])
+client = None
+if config['client']=="llama":
+    client = LlamaImageTextToTextModel(config['model_id'])
+elif config['client']=='deepseek':
+    client = DeepSeekImageTextToTextModel(config['model_id'])
+else:
+    api_key = os.getenv("OPENAI_API_KEY")
+    client = OpenAI(api_key=api_key, timeout=100) 
+
 
 def consistency_response(image_path, caption, idx):
     response = gpt4_consistency.get_response(image_path, caption, client)
