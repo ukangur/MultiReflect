@@ -1,9 +1,9 @@
-from consistency import gpt4_consistency
-from eval_check import gpt4_evalcheck
+from consistency import consistency
+from eval_check import eval_check
 from retrieval import text_retrieval, image_retrieval
 from filtering import filtering_text, filtering_image
 from ranking import combined
-from verification import verify
+from verification import verify2
 from utils import *
 
 from openai import OpenAI
@@ -25,7 +25,7 @@ else:
 
 
 def consistency_response(image_path, caption, idx):
-    response = gpt4_consistency.get_response(image_path, caption, client)
+    response = consistency.get_response(image_path, caption, client)
     verdict = 0
     if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
         os.makedirs(f"{config['output_path']}/generated/{idx}/")
@@ -61,7 +61,7 @@ def eval_check_response(
     image_path, caption, text_evidences, image_evidences, idx, first
 ):
     if first:
-        response = gpt4_evalcheck.get_response_first(image_path, caption, client)
+        response = eval_check.get_response_first(image_path, caption, client)
         if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
             os.makedirs(f"{config['output_path']}/generated/{idx}/")
         append_jsonl(
@@ -83,7 +83,7 @@ def eval_check_response(
                 needs_retrieval = True
         return needs_retrieval
     else:
-        response = gpt4_evalcheck.get_response_subs(
+        response = eval_check.get_response_subs(
             image_path, caption, text_evidences, image_evidences, client
         )
         if not os.path.exists(f"{config['output_path']}/generated/{idx}/"):
@@ -273,7 +273,7 @@ def init_pipeline(image_path, caption, idx):
             print("-" * 50)
             # Move to Verification
             print("Verifying for Sample", idx)
-            verify.get_response_subs(
+            verify2.get_response_subs(
                 idx,
                 image_path,
                 caption,
@@ -288,7 +288,7 @@ def init_pipeline(image_path, caption, idx):
             print("No Retrieval Needed for Sample", idx)
             print("-" * 50)
             print("Verifying for Sample", idx)
-            verify.get_response_subs(idx, image_path, caption, [], [], client)
+            verify2.get_response_subs(idx, image_path, caption, [], [], client)
             print("Verification Done for Sample", idx)
             print("-" * 50)
             print("-" * 50)
@@ -296,7 +296,7 @@ def init_pipeline(image_path, caption, idx):
         print("Consistency Verdict is False for Sample", idx)
         print("-" * 50)
         print("Verifying for Sample", idx)
-        verify.get_response_subs(idx, image_path, caption, [], [], client)
+        verify2.get_response_subs(idx, image_path, caption, [], [], client)
         print("Verification Done for Sample", idx)
         print("-" * 50)
         print("-" * 50)
