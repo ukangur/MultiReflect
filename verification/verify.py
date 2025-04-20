@@ -1,10 +1,15 @@
 import json
 import os
 from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    get_llava_cot_response,
+    load_config,
+    encode_image,
+)
 
+config = load_config()
 
-def verification_prompt(image_path, caption, text_evidences, image_evidences):
+def llava_cot_verification_prompt(image_path, caption, text_evidences, image_evidences):
     images = []
     messages = [
         {
@@ -50,12 +55,15 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
         images.append(image)
     return {"messages": messages, "images": images}
 
-
 def get_response_subs(
     file_name, image_path, caption, text_evidences, image_evidences, client
 ):
-    prompt = verification_prompt(image_path, caption, text_evidences, image_evidences)
+    response = ""
+    prompt = llava_cot_verification_prompt(
+        image_path, caption, text_evidences, image_evidences
+    )
     response = get_llava_cot_response(prompt, client)
+
     if not os.path.exists(f"./data/generated/{file_name}/"):
         os.makedirs(f"./data/generated/{file_name}/")
     with open(f"./data/generated/{file_name}/verification.json", "w") as f:

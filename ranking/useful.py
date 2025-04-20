@@ -1,10 +1,14 @@
 import os
 import json
 from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    get_llava_cot_response,
+    load_config,
+)
 
+config = load_config()
 
-def get_text_useful(caption, image_path, text_evidence):
+def get_llava_cot_text_useful(caption, image_path, text_evidence):
     image = Image.open(image_path)
     return {
         "messages": [
@@ -44,7 +48,6 @@ def get_text_useful(caption, image_path, text_evidence):
         "images": [image],
     }
 
-
 def get_text_useful_sample(file_name, caption, image_path, client):
     responses = {}
     evidence_file = json.load(
@@ -54,8 +57,22 @@ def get_text_useful_sample(file_name, caption, image_path, client):
         res_list = []
         for evidence in evidence_file[key]:
             try:
-                prompt = get_text_useful(caption, image_path, evidence["text"])
-                response = get_llava_cot_response(prompt, client)
+                response = ""
+                if config["client"] == "llama":
+                    prompt = get_llava_cot_text_useful(
+                        caption, image_path, evidence["text"]
+                    )
+                    response = get_llava_cot_response(prompt, client)
+                elif config["client"] == "deepseek":
+                    prompt = get_deepseekvl2_text_useful(
+                        caption, image_path, evidence["text"]
+                    )
+                    response = get_deepseek_vl2_response(prompt, client)
+                else:
+                    prompt = get_llava_cot_text_useful(
+                        caption, image_path, evidence["text"]
+                    )
+                    response = get_gpt4v_response(prompt, client)
                 res_list.append(response)
             except:
                 res_list.append("Error")
@@ -63,8 +80,7 @@ def get_text_useful_sample(file_name, caption, image_path, client):
         responses[key] = res_list
     return responses
 
-
-def get_image_useful(image_evidence_path, caption, image_path):
+def get_llava_cot_image_useful(image_evidence_path, caption, image_path):
     image = Image.open(image_path)
     image_ev = Image.open(image_evidence_path)
     images = [image, image_ev]
@@ -108,21 +124,17 @@ def get_image_useful(image_evidence_path, caption, image_path):
         "images": images,
     }
 
-
 def get_image_useful_sample(file_name, caption, image_path, client):
     responses = {}
     evidences = os.listdir(f"./data/filtered/{file_name}/image_data/")
     for evidence in evidences:
         try:
-            prompt = get_image_useful(
+            prompt = get_llava_cot_image_useful(
                 f"./data/filtered/{file_name}/image_data/" + evidence,
                 caption,
                 image_path,
             )
-            response = client.chat.completions.create(
-                model="gpt-4-vision-preview", messages=prompt, max_tokens=400
-            )
-            responses[evidence] = response.choices[0].message.content
+            responses[evidence] = get_llava_cot_response(prompt, client)
         except:
             responses[evidence] = "Error"
             continue

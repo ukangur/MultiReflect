@@ -1,10 +1,15 @@
 import os
 import json
 from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    get_llava_cot_response,
+    load_config,
+    encode_image,
+)
 
+config = load_config()
 
-def get_text_to_image_relevance(text_evidence, image_path):
+def get_llava_cot_text_to_image_relevance(text_evidence, image_path):
     image = Image.open(image_path)
     return {
         "messages": [
@@ -29,7 +34,6 @@ def get_text_to_image_relevance(text_evidence, image_path):
         "images": [image],
     }
 
-
 def get_text_to_image_relevance_sample(file_name, image_path, client):
     responses = {}
     evidence_file = json.load(
@@ -39,7 +43,10 @@ def get_text_to_image_relevance_sample(file_name, image_path, client):
         res_list = []
         for evidence in evidence_file[key]:
             try:
-                prompt = get_text_to_image_relevance(evidence["text"], image_path)
+                response = ""
+                prompt = get_llava_cot_text_to_image_relevance(
+                    evidence["text"], image_path
+                )
                 response = get_llava_cot_response(prompt, client)
                 res_list.append(response)
             except:
@@ -48,8 +55,7 @@ def get_text_to_image_relevance_sample(file_name, image_path, client):
         responses[key] = res_list
     return responses
 
-
-def get_image_to_text_relevance(image_evidence_path, caption):
+def get_llava_cot_image_to_text_relevance(image_evidence_path, caption):
     image = Image.open(image_evidence_path)
     return {
         "messages": [
@@ -80,7 +86,8 @@ def get_image_to_text_relevance_sample(file_name, caption, client):
     evidences = os.listdir(f"./data/filtered/{file_name}/image_data/")
     for evidence in evidences:
         try:
-            prompt = get_image_to_text_relevance(
+            response = ""
+            prompt = get_llava_cot_image_to_text_relevance(
                 f"./data/filtered/{file_name}/image_data/" + evidence, caption
             )
             response = get_llava_cot_response(prompt, client)

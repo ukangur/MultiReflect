@@ -3,7 +3,7 @@ from eval_check import eval_check
 from retrieval import text_retrieval, image_retrieval
 from filtering import filtering_text, filtering_image
 from ranking import combined
-from verification import verify2
+from verification import verify
 from utils import *
 
 from openai import OpenAI
@@ -14,15 +14,7 @@ from PIL import Image
 
 
 config = load_config()
-client = None
-if config["client"] == "llama":
-    client = LlamaImageTextToTextModel(config["model_id"])
-elif config["client"] == "deepseek":
-    client = DeepSeekImageTextToTextModel(config["model_id"])
-else:
-    api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=api_key, timeout=100)
-
+client = LlamaImageTextToTextModel(config["model_id"])
 
 def consistency_response(image_path, caption, idx):
     response = consistency.get_response(image_path, caption, client)
@@ -273,7 +265,7 @@ def init_pipeline(image_path, caption, idx):
             print("-" * 50)
             # Move to Verification
             print("Verifying for Sample", idx)
-            verify2.get_response_subs(
+            verify.get_response_subs(
                 idx,
                 image_path,
                 caption,
@@ -288,7 +280,7 @@ def init_pipeline(image_path, caption, idx):
             print("No Retrieval Needed for Sample", idx)
             print("-" * 50)
             print("Verifying for Sample", idx)
-            verify2.get_response_subs(idx, image_path, caption, [], [], client)
+            verify.get_response_subs(idx, image_path, caption, [], [], client)
             print("Verification Done for Sample", idx)
             print("-" * 50)
             print("-" * 50)
@@ -296,7 +288,7 @@ def init_pipeline(image_path, caption, idx):
         print("Consistency Verdict is False for Sample", idx)
         print("-" * 50)
         print("Verifying for Sample", idx)
-        verify2.get_response_subs(idx, image_path, caption, [], [], client)
+        verify.get_response_subs(idx, image_path, caption, [], [], client)
         print("Verification Done for Sample", idx)
         print("-" * 50)
         print("-" * 50)

@@ -1,10 +1,14 @@
 import os
 import json
 from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    get_llava_cot_response,
+    load_config,
+)
 
+config = load_config()
 
-def get_text_support(caption, image_path, text_evidence):
+def get_llava_cot_text_support(caption, image_path, text_evidence):
     image = Image.open(image_path)
     return {
         "messages": [
@@ -59,7 +63,10 @@ def get_text_support_sample(file_name, caption, image_path, client):
         res_list = []
         for evidence in evidence_file[key]:
             try:
-                prompt = get_text_support(caption, image_path, evidence["text"])
+                response = ""
+                prompt = get_llava_cot_text_support(
+                    caption, image_path, evidence["text"]
+                )
                 response = get_llava_cot_response(prompt, client)
                 res_list.append(response)
             except:
@@ -68,8 +75,7 @@ def get_text_support_sample(file_name, caption, image_path, client):
         responses[key] = res_list
     return responses
 
-
-def get_image_support(image_evidence_path, caption, image_path):
+def get_llava_cot_image_support(image_evidence_path, caption, image_path):
 
     image = Image.open(image_path)
     ev_image = Image.open(image_evidence_path)
@@ -121,13 +127,13 @@ def get_image_support(image_evidence_path, caption, image_path):
         "images": images,
     }
 
-
 def get_image_support_sample(file_name, caption, image_path, client):
     responses = {}
     evidences = os.listdir(f"./data/filtered/{file_name}/image_data/")
     for evidence in evidences:
         try:
-            prompt = get_image_support(
+            response = ""
+            prompt = get_llava_cot_image_support(
                 f"./data/filtered/{file_name}/image_data/" + evidence,
                 caption,
                 image_path,
