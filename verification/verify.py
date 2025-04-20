@@ -1,11 +1,15 @@
 import json
 import os
-from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    load_config,
+    encode_image,
+    get_gpt4v_response,
+)
+
+config = load_config()
 
 
-def verification_prompt(image_path, caption, text_evidences, image_evidences):
-    images = []
+def gpt4v_verification_prompt(image_path, caption, text_evidences, image_evidences):
     messages = [
         {
             "role": "user",
@@ -24,7 +28,11 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
                     "text": f"Caption: {caption}",
                 },
                 {
-                    "type": "image",
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{encode_image(image_path)}",
+                        "detail": "high",
+                    },
                 },
                 {
                     "type": "text",
@@ -33,8 +41,6 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
             ],
         }
     ]
-    image = Image.open(image_path)
-    images.append(image)
     for i in range(len(text_evidences)):
         messages[0]["content"].append(
             {"type": "text", "text": f"Text Evidence: {text_evidences[i]}"}
@@ -43,19 +49,25 @@ def verification_prompt(image_path, caption, text_evidences, image_evidences):
     for i in range(len(image_evidences)):
         messages[0]["content"].append(
             {
-                "type": "image",
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{encode_image(image_evidences[i])}",
+                    "detail": "high",
+                },
             }
         )
-        image = Image.open(image_evidences[i])
-        images.append(image)
-    return {"messages": messages, "images": images}
+    return {"messages": messages}
 
 
 def get_response_subs(
     file_name, image_path, caption, text_evidences, image_evidences, client
 ):
-    prompt = verification_prompt(image_path, caption, text_evidences, image_evidences)
-    response = get_llava_cot_response(prompt, client)
+   
+    prompt = gpt4v_verification_prompt(
+        image_path, caption, text_evidences, image_evidences
+    )
+    response = get_gpt4v_response(prompt, client)
+
     if not os.path.exists(f"./data/generated/{file_name}/"):
         os.makedirs(f"./data/generated/{file_name}/")
     with open(f"./data/generated/{file_name}/verification.json", "w") as f:

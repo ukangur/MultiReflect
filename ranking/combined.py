@@ -1,6 +1,6 @@
-import ranking.relevance2 as relevance
-import ranking.support2 as support
-import ranking.useful2 as useful
+import ranking.relevance as relevance
+import ranking.support as support
+import ranking.useful as useful
 import ranking.authoritative as authoritative
 import ranking.freshness as freshness
 import os

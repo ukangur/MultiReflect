@@ -1,9 +1,4 @@
-from consistency import gpt4_consistency
-from eval_check import gpt4_evalcheck
-from retrieval import text_retrieval, image_retrieval
-from filtering import filtering_text, filtering_image
-from ranking import combined
-from verification import verify_noevi2
+from verification import verify_noevi
 from utils import *
 
 from openai import OpenAI
@@ -14,18 +9,11 @@ import pandas as pd
 from PIL import Image
 
 config = load_config()
-client = None
-if config["client"] == "llama":
-    client = LlamaImageTextToTextModel(config["model_id"])
-elif config["client"] == "deepseek":
-    client = DeepSeekImageTextToTextModel(config["model_id"])
-else:
-    api_key = os.getenv("OPENAI_API_KEY")
-    client = OpenAI(api_key=api_key, timeout=100)
+client = GptImagetextToTextModel(config["model_api_key"])
 
 
 def init_pipeline(image_path, caption, idx):
-    verify_noevi2.get_response_subs(idx, image_path, caption, client)
+    verify_noevi.get_response_subs(idx, image_path, caption, client)
 
 
 df = pd.read_csv("./data/original/VERITE.csv")
