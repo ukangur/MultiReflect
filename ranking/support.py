@@ -1,20 +1,20 @@
 import os
 import json
 from PIL import Image
-from utils import get_llava_cot_response
+from utils import (
+    load_config,
+    encode_image,
+    get_deepseek_vl2_response,
+)
 
+config = load_config()
 
-def get_text_support(caption, image_path, text_evidence):
-    image = Image.open(image_path)
+def get_deepseekvl2_text_support(caption, image_path, text_evidence):
     return {
         "messages": [
             {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": """
-            You will receive an input text, input image and text evidence towards determining the factuality of the input.
+                "role": "<|User|>",
+                "content": """You will receive an input text, input image and text evidence towards determining the factuality of the input.
             Your task is to evaluate if the input is fully supported by the information provided
             in the evidence.
             Use the following entailment scale to generate a score:
@@ -29,24 +29,14 @@ def get_text_support(caption, image_path, text_evidence):
             instruction.
             Make sure to not use any external information/knowledge to judge whether the input is true or not.
             Only check whether the input is supported by the evidence, and not whether the input follows the instructions or not.
-            Output Entailment like [Fully supported], [Partially supported] or [No support / Contradictory]
-            """,
-                    },
-                    {
-                        "type": "text",
-                        "text": f"Input Text: {caption}\n\nInput Image: ",
-                    },
-                    {
-                        "type": "image",
-                    },
-                    {
-                        "type": "text",
-                        "text": f"Text Evidence: {text_evidence}",
-                    },
-                ],
+            Output Entailment like [Fully supported], [Partially supported] or [No support / Contradictory]"""
+                f"\n \n \t Input Text: {caption} \n\nInput Image:"
+                "<image>"
+                f"\n \n \t \t Text Evidence {text_evidence}",
+                "images": [image_path],
             },
-        ],
-        "images": [image],
+            {"role": "<|Assistant|>", "content": ""},
+        ]
     }
 
 
@@ -59,8 +49,11 @@ def get_text_support_sample(file_name, caption, image_path, client):
         res_list = []
         for evidence in evidence_file[key]:
             try:
-                prompt = get_text_support(caption, image_path, evidence["text"])
-                response = get_llava_cot_response(prompt, client)
+                response = ""
+                prompt = get_deepseekvl2_text_support(
+                    caption, image_path, evidence["text"]
+                )
+                response = get_deepseek_vl2_response(prompt, client)
                 res_list.append(response)
             except:
                 res_list.append("Error text")
@@ -68,21 +61,14 @@ def get_text_support_sample(file_name, caption, image_path, client):
         responses[key] = res_list
     return responses
 
+def get_deepseekvl2_image_support(image_evidence_path, caption, image_path):
 
-def get_image_support(image_evidence_path, caption, image_path):
-
-    image = Image.open(image_path)
-    ev_image = Image.open(image_evidence_path)
-    images = [image, ev_image]
+    images = [image_path, image_evidence_path]
     return {
         "messages": [
             {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": """
-            You will receive an input text, input image and image evidence towards determining the factuality of the input.
+                "role": "<|User|>",
+                "content": """You will receive an input text, input image and image evidence towards determining the factuality of the input.
             Your task is to evaluate if the input is fully supported by the information provided
             in the evidence.
             Use the following entailment scale to generate a score:
@@ -98,27 +84,15 @@ def get_image_support(image_evidence_path, caption, image_path):
             Make sure to not use any external information/knowledge to judge whether the input is true or not.
             Only check whether the input is supported by the evidence, and not whether the input follows the instructions or not.
             
-            Output Entailment like [Fully supported], [Partially supported] or [No support / Contradictory]
-            """,
-                    },
-                    {
-                        "type": "text",
-                        "text": f"Input Text: {caption}\n\nInput Image: ",
-                    },
-                    {
-                        "type": "image",
-                    },
-                    {
-                        "type": "text",
-                        "text": f"Image Evidence: ",
-                    },
-                    {
-                        "type": "image",
-                    },
-                ],
-            }
-        ],
-        "images": images,
+            Output Entailment like [Fully supported], [Partially supported] or [No support / Contradictory]"""
+                f"\n \n \t Input Text: {caption} \n\nInput Image:"
+                "<image>"
+                "\n \n \t \t Image Evidence: "
+                "<image>",
+                "images": images,
+            },
+            {"role": "<|Assistant|>", "content": ""},
+        ]
     }
 
 
@@ -127,12 +101,13 @@ def get_image_support_sample(file_name, caption, image_path, client):
     evidences = os.listdir(f"./data/filtered/{file_name}/image_data/")
     for evidence in evidences:
         try:
-            prompt = get_image_support(
+            response = ""
+            prompt = get_deepseekvl2_image_support(
                 f"./data/filtered/{file_name}/image_data/" + evidence,
                 caption,
                 image_path,
             )
-            response = get_llava_cot_response(prompt, client)
+            response = get_deepseek_vl2_response(prompt, client)
             responses[evidence] = response
         except:
             responses[evidence] = "Error image"

@@ -21,6 +21,7 @@ fi
 # Step 3: Download necessary language model for spaCy (if applicable)
 echo "Step 3: Downloading spaCy language model (en)..."
 python -m spacy download en
+pip install git+https://github.com/deepseek-ai/DeepSeek-VL2.git --no-deps
 
 # Step 4: Run the main script
 echo "Step 4: Running the main script..."
