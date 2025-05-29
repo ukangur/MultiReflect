@@ -1,0 +1,19 @@
+# General Configuration
+"model_id": "gpt-4-vision-preview"
+"model_api_key": "..."
+"clip_model_id": 'openai/clip-vit-large-patch14'
+"data_path": "./data/original"
+"output_path": "./data"
+"device_map": "auto"
+# Retrieval Specific Configuration 
+"google_oauth_credentials": "..."
+"google_customseacrh_key": "..."
+"bing_ocp_apim_subscription_key": "..."
+"client_id": "..."
+"client_secret": "..."
+"access_token": "..."
+"wiki_user_agent": "..."
+"wiki_authorization_bearer_key": "..."
+# Retrieval Specific Parameters
+"max_chunk_size": 300
+"chunk_overlap": 100
