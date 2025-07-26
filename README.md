@@ -24,9 +24,9 @@ MultiReflect/
 ├── verite_prep.py               # Verite dataset preparation script
 ├── requirements.txt             # The python package requirements of the project
 ├── consistency/
-│   └── gpt4_consistency.py      # Ensures consistency using GPT-4
+│   └── consistency.py      # Ensures consistency using GPT-4
 ├── eval_check/
-│   └── gpt4_evalcheck.py        # Evaluation check using GPT-4
+│   └── evalcheck.py        # Evaluation check using GPT-4
 ├── filtering/
 │   ├── filtering_image.py       # Image filtering operations
 │   └── filtering_text.py        # Text filtering operations
