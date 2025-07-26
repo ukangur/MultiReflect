@@ -33,7 +33,7 @@ def get_google_images(caption):
         query = create_query(entities)
     # url = f"https://www.googleapis.com/customsearch/v1?key={config[""]}&cx=b7f8c7d4cce094056&q=" + query + "&searchType=image"
     try:
-        service = build("customsearch", "v1", developerKey = config["google_customseacrh_key"]) #google_customseacrh_key
+        service = build("customsearch", "v1", developerKey = config["google_customsearch_key"]) #google_customsearch_key
         res = service.cse().list(q=query,cx="b7f8c7d4cce094056",searchType="image").execute()
         # response = requests.get(url)
         # data = response.json()
