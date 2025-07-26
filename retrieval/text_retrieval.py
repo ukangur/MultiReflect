@@ -39,7 +39,7 @@ def get_wikipedia_data(query):
     
 def get_google_data(query):
     try:
-        url = f"https://www.googleapis.com/customsearch/v1?key={config["google_customseacrh_key"]}&cx=b7f8c7d4cce094056&q=" + query
+        url = f"https://www.googleapis.com/customsearch/v1?key={config["google_customsearch_key"]}&cx=b7f8c7d4cce094056&q=" + query
         response = requests.get(url, timeout=60)
         data = response.json()
         return data            
