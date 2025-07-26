@@ -137,6 +137,7 @@ To run the full pipeline, you need to create several API keys:
 2. Create a [JSON service account key for Google Vision](https://stackoverflow.com/questions/46287267/how-can-i-get-the-file-service-account-json-for-google-translate-api). Add that JSON file to the MultiReflect folder.
 3. Get [Bing API](https://www.microsoft.com/en-us/bing/apis/bing-web-search-api) key.
 4. Get [Wikimedia API](https://api.wikimedia.org/wiki/Main_Page) app name, email and key.
+5. Get an [OpenAI API](https://openai.com/api/) key
 
 Then you can fill in the config as follows:
 
