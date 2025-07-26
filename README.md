@@ -1,6 +1,6 @@
 # MultiReflect
 
-This is the code repository for the paper "MultiReflect: Multimodal Self-Reflective RAG-based Automated Fact-Checking". 
+This is the code repository for the paper "MultiReflect: Multimodal Self-Reflective RAG-based Automated Fact-Checking". **This branch is for running the pipeline with DeepSeek models i.e. DeepSeek-VL2**
 
 We introduce MultiReflect, a novel multimodal self-reflective Retrieval Augmented Generation (RAG)-based automated fact-checking pipeline.MultiReflect is designed to address the challenges of rapidly outdated information, limitations in human query capabilities, and expert knowledge barriers in fact-checking. Our proposed pipeline leverages the latest advancements in Large Language Models (LLMs) and Retrieval Augmented Generation (RAG) to enhance fact verification across text and images. Specifically, by integrating multimodal data processing with RAG-based evidence reflection, our system improves the accuracy of fact-checking by utilizing internet-sourced verification. A high level overview of the MultiReflect pipeline can be seen in the following figure: <br> <br> ![MultiReflect](Multireflect_pipeline.png)
 
@@ -137,6 +137,21 @@ To run the full pipeline, you need to create several API keys:
 2. Create a [JSON service account key for Google Vision](https://stackoverflow.com/questions/46287267/how-can-i-get-the-file-service-account-json-for-google-translate-api). Add that JSON file to the MultiReflect folder.
 3. Get [Bing API](https://www.microsoft.com/en-us/bing/apis/bing-web-search-api) key.
 4. Get [Wikimedia API](https://api.wikimedia.org/wiki/Main_Page) app name, email and key.
+
+Then you can fill in the config as follows:
+
+| Setting                           | Description                                                                 |
+|-----------------------------------|-----------------------------------------------------------------------------|
+| `model_id`                        | DeepSeek multimodal reasoning model from Huggingface (e.g., `'deepseek-ai/deepseek-vl2-tiny'`)                          |
+| `clip_model_id`                   | CLIP model from Huggingface for vision-text similarity (e.g., `'openai/clip-vit-large-patch14'`) |
+| `data_path`                       | Path to input data (e.g., `./data/original`)                                |
+| `output_path`                     | Output directory (e.g., `./data`)                                           |
+| `device_map`                      | Device setting for model execution (e.g., `"auto"`)                         |
+| `google_oauth_credentials`        | OAuth2 JSON key filename for Google services                                         |
+| `google_customsearch_key`         | API key for Google Custom Search                                            |
+| `bing_ocp_apim_subscription_key`  | API key for Bing Web Search                                                 |
+| `wiki_user_agent`                 | Your app’s user-agent for Wikimedia requests                                |
+| `wiki_authorization_bearer_key`   | Authorization token for Wikimedia API  
 
 ### Running the Main Script
 To execute the primary functionality ,add your corresponding keys and model info into the config file. After that just run:
