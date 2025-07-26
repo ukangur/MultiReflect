@@ -7,9 +7,6 @@ from utils import load_config
 
 config = load_config()
 nlp = spacy.load('en_core_web_sm')
-client_id = config["client_id"]
-client_secret = config["client_secret"]
-access_token = config["access_token"]
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36 Edg/122.0.0.0', 'Referer': 'https://www.google.com/'}
 
 def get_entities(text):
@@ -33,7 +30,7 @@ def get_google_images(caption):
         query = create_query(entities)
     # url = f"https://www.googleapis.com/customsearch/v1?key={config[""]}&cx=b7f8c7d4cce094056&q=" + query + "&searchType=image"
     try:
-        service = build("customsearch", "v1", developerKey = config["google_customseacrh_key"]) #google_customseacrh_key
+        service = build("customsearch", "v1", developerKey = config["google_customsearch_key"]) #google_customsearch_key
         res = service.cse().list(q=query,cx="b7f8c7d4cce094056",searchType="image").execute()
         # response = requests.get(url)
         # data = response.json()
