@@ -7,7 +7,7 @@
 "device_map": "auto"
 # Retrieval Specific Configuration 
 "google_oauth_credentials": "..."
-"google_customseacrh_key": "..."
+"google_customsearch_key": "..."
 "bing_ocp_apim_subscription_key": "..."
 "client_id": "..."
 "client_secret": "..."
