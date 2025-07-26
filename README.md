@@ -4,8 +4,6 @@ This is the code repository for the paper "MultiReflect: Multimodal Self-Reflect
 
 We introduce MultiReflect, a novel multimodal self-reflective Retrieval Augmented Generation (RAG)-based automated fact-checking pipeline.MultiReflect is designed to address the challenges of rapidly outdated information, limitations in human query capabilities, and expert knowledge barriers in fact-checking. Our proposed pipeline leverages the latest advancements in Large Language Models (LLMs) and Retrieval Augmented Generation (RAG) to enhance fact verification across text and images. Specifically, by integrating multimodal data processing with RAG-based evidence reflection, our system improves the accuracy of fact-checking by utilizing internet-sourced verification. A high level overview of the MultiReflect pipeline can be seen in the following figure: <br> <br> ![MultiReflect](Multireflect_pipeline.png)
 
-**Note:** As of June 2024 GPT-4V is deprecated and as an alternative GPT-4o has been implemented as the main model. The example in this repository is given using GPT-4V.
-
 ## Features
 
 - **Consistency Checks**: To ensure consistency across image and text. Phase 1 on figure.
@@ -24,9 +22,9 @@ MultiReflect/
 ├── verite_prep.py               # Verite dataset preparation script
 ├── requirements.txt             # The python package requirements of the project
 ├── consistency/
-│   └── consistency.py      # Ensures consistency using GPT-4
+│   └── consistency.py      # Ensures consistency
 ├── eval_check/
-│   └── evalcheck.py        # Evaluation check using GPT-4
+│   └── evalcheck.py        # Evaluation check
 ├── filtering/
 │   ├── filtering_image.py       # Image filtering operations
 │   └── filtering_text.py        # Text filtering operations
@@ -151,7 +149,9 @@ Then you can fill in the config as follows:
 | `google_customsearch_key`         | API key for Google Custom Search                                            |
 | `bing_ocp_apim_subscription_key`  | API key for Bing Web Search                                                 |
 | `wiki_user_agent`                 | Your app’s user-agent for Wikimedia requests                                |
-| `wiki_authorization_bearer_key`   | Authorization token for Wikimedia API  
+| `wiki_authorization_bearer_key`   | Authorization token for Wikimedia API                                       |
+| `max_chunk_size`   | Maximum input chunk size in characters for the model                                       |
+| `chunk_overlap`   | Chunk overlap size in characters for the model
 
 ### Running the Main Script
 To execute the primary functionality ,add your corresponding keys and model info into the config file. After that just run:
@@ -191,7 +191,7 @@ Verification Done for Sample 1
 ```
 
 ### Example pipeline responses:
-The pipeline also saves the consistency and verification responses. The following is the first example from the VERITE dataset run using GPT-4V. All of the outputs and retrieved evidences for this datapoint are given in the folder [example demo](https://anonymous.4open.science/r/MultiReflect/demo%20example/demo_README.md) (please refresh the page if the demo_readme.md file does not open or open it manually)
+The pipeline also saves the consistency and verification responses. The following is the first example from the VERITE dataset. All of the outputs and retrieved evidences for this datapoint are given in the folder [example demo](https://anonymous.4open.science/r/MultiReflect/demo%20example/demo_README.md) (please refresh the page if the demo_readme.md file does not open or open it manually)
 
 **IMAGE:**
 
@@ -227,7 +227,7 @@ TRUE
 Run specific modules as needed. Some scripts might need to be modified depending on your input format, so we recommend loading in the functions from those scripts and adapting them where needed.
 - Consistency Check:
   ```bash
-  python consistency/gpt4_consistency.py
+  python consistency/consistency.py
   ```
 - Image Filtering:
   ```bash
