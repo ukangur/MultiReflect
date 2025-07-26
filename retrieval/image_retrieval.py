@@ -7,9 +7,6 @@ from utils import load_config
 
 config = load_config()
 nlp = spacy.load('en_core_web_sm')
-client_id = config["client_id"]
-client_secret = config["client_secret"]
-access_token = config["access_token"]
 headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36 Edg/122.0.0.0', 'Referer': 'https://www.google.com/'}
 
 def get_entities(text):
