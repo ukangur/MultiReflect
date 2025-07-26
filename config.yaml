@@ -9,8 +9,5 @@
 "google_oauth_credentials": "..."
 "google_customsearch_key": "..."
 "bing_ocp_apim_subscription_key": "..."
-"client_id": "..."
-"client_secret": "..."
-"access_token": "...
 "wiki_user_agent": "..."
 "wiki_authorization_bearer_key": "..."
